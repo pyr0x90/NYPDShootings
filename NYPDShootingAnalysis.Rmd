@@ -1,0 +1,139 @@
+---
+title: "DataScienceWeek3Assignment"
+author: "Megan Arnold"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: inline
+---
+
+
+```{r Install of Packages, include = FALSE}
+
+#!!!READ  BEFORE RUNNING: Comment out below install of packages if you don't want them installed through this method. Only completed to ensure the document would knit first try.
+
+
+#if(!require(ggplot2)) install.packages("ggplot2",repos = "http://cran.us.r-project.org")
+
+#if(!require(dplyr)) install.packages("dplyr",repos = "http://cran.us.r-project.org")
+
+#if(!require(tidyr)) install.packages("tidyr",repos = "http://cran.us.r-project.org")
+
+#if(!require(questionr)) install.packages("questionr",repos = "http://cran.us.r-project.org")
+```
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(questionr)
+```
+
+## Import Data
+
+```{r data, message = FALSE}
+url <- "https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv?accessType=DOWNLOAD"
+nypdData <- read.csv(url,header=TRUE,sep=",")
+```
+
+## Initial Analysis
+
+The imported data comes from the NYPD database of shooting incidences from 2006 until present. In the data, it includes the data and time, location (Precinct, jurisdiction, longitude/latitude, borough), the demographics (Race, Age Group, Sex) of the perpetrator and victim, and whether or not the victim was murdered. This seems to be a good source for violent crimes involving a firearm.
+
+Using this data, I'm going to determine if the location (borough) has any correlation to the age group of the perpetrator. This information could allow for a better understanding of the age groups that are committing the shootings. There are many things that could be done with this information (additional job training, anger management help, gun control, etc). Special consideration must be taking to prevent predictive policing causing additional racial injustices. 
+
+```{r Summary}
+summary(nypdData)
+```
+
+## Cleaning Data for Analysis
+```{r Data Selection}
+columns = c("BORO","PERP_AGE_GROUP","PERP_SEX")
+df = select(nypdData,all_of(columns))
+
+#Data tabulated
+table(df$BORO,df$PERP_AGE_GROUP)
+```
+### Table Analysis
+
+The above table is grouped by the BORO column and displaying the summary of the PERP_AGE_GROUP. There is a significant portion of missing data. I plan of keeping that information and displaying it as unknown in the charts. This will help to determine if there are causes for the unknown data or if it is randomly unknown.
+
+Also, there are two data points where the age value is "1020", "940", and "224". Since these are errors in the data, I will remove those values before I begin my analysis.
+
+Also, I will combine the values that were labeled as blank or "unknown" as NA
+
+```{r Cleaning NA/Unknown/blank Values}
+df = df[!(df$PERP_AGE_GROUP==224 | df$PERP_AGE_GROUP==940 | df$PERP_AGE_GROUP==1020),] #Remove the incorrect data
+df$PERP_AGE_GROUP[(df$PERP_AGE_GROUP=="" | df$PERP_AGE_GROUP=="UNKNOWN")] <-NA #Make blank and unknown consistent
+```
+
+## Visualizations
+
+### Visualization 1
+```{r Data Visualizations}
+ggplot(data = df, aes(x = BORO, fill = PERP_AGE_GROUP)) +
+  geom_bar() +
+  ggtitle("Crime Count by Age Group grouped by Boroughs") + 
+  xlab("Boroughs") +
+  ylab("Count of Incidents") +
+  theme_bw()
+```
+
+### Visualization 1 Analysis
+
+Looking at the above data, it appears that the distribution in crimes per age group is similar amongst the boroughs. However, the unknown data is skewing the results. I'm going to create stacked percentage chart without the NA data.
+
+### Visualization 2
+```{r Removing unknown data}
+dfKnown = df[!(is.na(df$PERP_AGE_GROUP)),]
+table(df$BORO,df$PERP_AGE_GROUP)
+```
+```{r Percentile Chart}
+ggplot(data = dfKnown, aes(x = BORO, fill = PERP_AGE_GROUP)) +
+  geom_bar(position = "fill") +
+  ggtitle("Crime Percentage by Age Group grouped by Borough") + 
+  xlab("Boroughs") +
+  ylab("Count of Incidents")+
+  theme_bw()
+```
+
+### Visualization 2 Analysis
+
+As we can see in the Percentile chart, it appears that the borough where the crime was committed is independent of the age group. A chi squared test for independence will tell us our p-value. 
+
+Additional analysis can be done on based on the rate of crime per 100,000 people in the borough. Also, the crime rate within the age group could be determined. This information could help make predictions as age demographics shift with time.
+
+## Model/Analysis
+
+Since this data is categorized data and something like a linear model isn't valid, I'm going to do a statistical analysis to determine if my initial assumption based on the visualization was correct. I will do a chi-squared test for independence to determine if the age of the perpetrator is independent of the borough.
+
+```{r chi-squared test, message=FALSE}
+
+chisqTest = chisq.test(table(df$BORO,df$PERP_AGE_GROUP))
+print(chisqTest)
+
+print(chisq.residuals(table(df$BORO,df$PERP_AGE_GROUP),std=FALSE, raw=FALSE))
+```
+
+### Model Analysis
+
+In the above test, it shows a p value of 0.00000195. Looking at the residuals of the test, we can see that the "Queens, <18" jumps out as a large residual. 
+
+Note:
+I duplicated the calculation outside of R due to the warning: "Chi-squared approximation may be incorrect". The p value was the same. 
+
+
+
+### Bias
+
+A potential cause of bias in the data could be caused by the patrol patterns of the police. If they suspect a certain age group to be committing crimes, then it is possible they would patrol the area more frequently; thus, catch them committing the crimes with an increased frequency compared to the areas they were not patrolling. 
+
+Also, there could be a source of bias from who reports the crimes. If there is a non random cause for people to not report crimes, then that cause could show up in the data.
+
+There was also a significant amount of unknown data in the "Age Group" category. If the cause of that missing data isn't random, then that would create a bias in the data source.
+
+
