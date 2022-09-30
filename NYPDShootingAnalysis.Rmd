@@ -85,7 +85,7 @@ ggplot(data = df, aes(x = BORO, fill = PERP_AGE_GROUP)) +
 
 ### Visualization 1 Analysis
 
-Looking at the above data, it appears that the distribution in crimes per age group is similar amongst the boroughs. However, the unknown data is skewing the results. I'm going to create stacked percentage chart without the NA data.
+Looking at the above data, it appears that the distribution in crimes per age group is similar amongst the boroughs. However, the unknown data is skewing the results. I'm going to create stacked percentage chart without the NA data. For future analysis, it would be interesting to see if the only reason for the large amounts of unknown ages is that the crime hasn't been solved. I would need to find another data source because this data sources doesn't appear to have the flag on the outcome of the investigations.
 
 ### Visualization 2
 ```{r Removing unknown data}
@@ -121,19 +121,18 @@ print(chisq.residuals(table(df$BORO,df$PERP_AGE_GROUP),std=FALSE, raw=FALSE))
 
 ### Model Analysis
 
-In the above test, it shows a p value of 0.00000195. Looking at the residuals of the test, we can see that the "Queens, <18" jumps out as a large residual. 
+In the above test, it shows a p value of 0.00000195. Looking at the residuals of the test, we can see that the "Queens, <18" jumps out as a large residual. T
 
 Note:
 I duplicated the calculation outside of R due to the warning: "Chi-squared approximation may be incorrect". The p value was the same. 
 
 
-
-### Bias
+### Conclusion/Bias
+The information provided in this report can be used to help determine what age group programs should target to help prevent them from committing crimes. It appears that over 50% of the people who commit shooting crimes are under the age of 25. To help augment this analysis, I would do a heat map of the crimes to identify clusters. That would also help narrow down where helpful resources need to be deployed. 
 
 A potential cause of bias in the data could be caused by the patrol patterns of the police. If they suspect a certain age group to be committing crimes, then it is possible they would patrol the area more frequently; thus, catch them committing the crimes with an increased frequency compared to the areas they were not patrolling. 
 
 Also, there could be a source of bias from who reports the crimes. If there is a non random cause for people to not report crimes, then that cause could show up in the data.
 
 There was also a significant amount of unknown data in the "Age Group" category. If the cause of that missing data isn't random, then that would create a bias in the data source.
-
 
