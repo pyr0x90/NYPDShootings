@@ -121,7 +121,7 @@ print(chisq.residuals(table(df$BORO,df$PERP_AGE_GROUP),std=FALSE, raw=FALSE))
 
 ### Model Analysis
 
-In the above test, it shows a p value of 0.00000195. Looking at the residuals of the test, we can see that the "Queens, <18" jumps out as a large residual. T
+In the above test, it shows a p value of 0.00000195. Looking at the residuals of the test, we can see that the "Queens, <18" jumps out as a large residual.
 
 Note:
 I duplicated the calculation outside of R due to the warning: "Chi-squared approximation may be incorrect". The p value was the same. 
@@ -132,7 +132,7 @@ The information provided in this report can be used to help determine what age g
 
 A potential cause of bias in the data could be caused by the patrol patterns of the police. If they suspect a certain age group to be committing crimes, then it is possible they would patrol the area more frequently; thus, catch them committing the crimes with an increased frequency compared to the areas they were not patrolling. 
 
-Also, there could be a source of bias from who reports the crimes. If there is a non random cause for people to not report crimes, then that cause could show up in the data.
+Also, there could be a source of bias in who reports the crimes. If there is a non random cause for people to not report crimes, then that cause would show up in the data.
 
 There was also a significant amount of unknown data in the "Age Group" category. If the cause of that missing data isn't random, then that would create a bias in the data source.
 
