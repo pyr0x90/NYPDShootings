@@ -1,9 +1,9 @@
 ---
-title: "DataScienceWeek3Assignment"
+title: "NYPD Shooting Analysis"
 author: "Megan Arnold"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 editor_options:
   chunk_output_type: inline
 ---
