@@ -2,8 +2,8 @@
 title: "DataScienceWeek3Assignment"
 author: "Megan Arnold"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 editor_options:
   chunk_output_type: inline
 ---
